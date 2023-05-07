@@ -2,12 +2,12 @@ import { useCallback, useState } from 'react';
 import InputText from '@/components/inputText';
 import font from '@/utils/font';
 import axios from 'axios';
-import { useSession, signIn, signOut } from 'next-auth/react';
-import { useRouter } from 'next/router';
+import { signIn } from 'next-auth/react';
+
+import { FcGoogle } from 'react-icons/fc';
+import { FaGithub } from 'react-icons/fa';
 
 export default function Auth() {
-  const router = useRouter();
-
   const [email, setEmail] = useState('');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
@@ -23,18 +23,12 @@ export default function Auth() {
       await signIn('credentials', {
         login,
         password,
-        redirect: false,
-        callbackUrl: '/',
-      }).then((req) => {
-        if (req?.error) {
-          throw new Error(req.error);
-        }
-        router.push('/');
+        callbackUrl: '/profile',
       });
     } catch (error) {
       console.log(error);
     }
-  }, [login, password, router]);
+  }, [login, password]);
 
   const register = useCallback(async () => {
     try {
@@ -59,7 +53,7 @@ export default function Auth() {
     >
       <div className="m-auto w-[18.5rem] bg-uii3 border border-ui3 rounded-md text-zinc-200 px-5 max-sm:w-full">
         <h1 className="my-8 text-xl">{variant === 'login' ? 'Sign in' : 'Register'}</h1>
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-3">
           {variant === 'register' && (
             <InputText
               id="email"
@@ -89,6 +83,25 @@ export default function Auth() {
           >
             {variant === 'login' ? 'login' : 'register'}
           </button>
+
+          <div className="flex gap-4 w-[100%] border-t justify-center pt-3 border-ui2">
+            <div
+              onClick={() => signIn('google', { callbackUrl: '/profile' })}
+              className="bg-ui2 h-8 w-8 rounded-md flex justify-center items-center shadow-md shadow-zinc-800 cursor-pointer hover:shadow-uii1 hover:shadow-lg hover:opacity-90 transition"
+            >
+              <FcGoogle size={23}></FcGoogle>
+            </div>
+            <div
+              onClick={() => signIn('github', { callbackUrl: '/profile' })}
+              className="bg-ui2 h-8 w-8 rounded-md flex justify-center items-center shadow-md shadow-zinc-800 cursor-pointer hover:shadow-uii1 hover:shadow-lg hover:opacity-90 transition"
+            >
+              <FaGithub
+                size={23}
+                color="#222"
+              ></FaGithub>
+            </div>
+          </div>
+
           <p className="text-neutral-400 mb-8">
             {variant === 'login' ? 'first time here? ' : 'Already have an account? '}
             <span
